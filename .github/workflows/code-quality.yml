@@ -52,5 +52,8 @@ jobs:
 
       - name: Verificar dependencias de seguridad
         run: |
-          cd backend && npm audit --audit-level=high || true
-          cd ../frontend && npm audit --audit-level=high || true
+          echo "Auditando dependencias del backend..."
+          cd backend && npm ci && npm audit --audit-level=high || true
+          echo ""
+          echo "Auditando dependencias del frontend..."
+          cd ../frontend && npm ci && npm audit --audit-level=high || true
