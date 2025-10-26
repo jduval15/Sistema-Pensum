@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npm:*)",
-      "Bash(node --version:*)"
+      "Bash(npx:*)",
+      "Bash(node --version:*)",
+      "Bash(/dev/null)"
     ],
     "deny": [],
     "ask": []

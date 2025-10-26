@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useMateriasStore } from '../store/materiasStore';
 import { useTrimestresStore } from '../store/trimestresStore';
-import { Materia } from '../types';
 
 export default function PlanificarTrimestre() {
   const { materiasDisponibles, fetchMateriasDisponibles, inscribirMateria } = useMateriasStore();
-  const { trimestres, trimestreActual, fetchTrimestres, fetchTrimestreActual, crearTrimestre, activarTrimestre } = useTrimestresStore();
+  const { trimestres, fetchTrimestres, fetchTrimestreActual, crearTrimestre, activarTrimestre } = useTrimestresStore();
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [trimestreSeleccionado, setTrimestreSeleccionado] = useState<number | null>(null);
