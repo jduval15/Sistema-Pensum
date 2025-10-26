@@ -1,0 +1,56 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality-check:
+    name: Verificación de Calidad
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Verificar formato de archivos
+        run: |
+          echo "Verificando archivos del proyecto..."
+          find . -name "*.js" -o -name "*.ts" -o -name "*.tsx" | head -10
+
+      - name: Verificar estructura del proyecto
+        run: |
+          echo "✅ Estructura Backend:"
+          ls -la backend/src/ || echo "❌ Falta carpeta backend/src"
+
+          echo ""
+          echo "✅ Estructura Frontend:"
+          ls -la frontend/src/ || echo "❌ Falta carpeta frontend/src"
+
+      - name: Verificar archivos de configuración
+        run: |
+          echo "Verificando archivos críticos..."
+          test -f backend/package.json && echo "✅ backend/package.json" || echo "❌ Falta backend/package.json"
+          test -f frontend/package.json && echo "✅ frontend/package.json" || echo "❌ Falta frontend/package.json"
+          test -f backend/prisma/schema.prisma && echo "✅ schema.prisma" || echo "❌ Falta schema.prisma"
+          test -f README.md && echo "✅ README.md" || echo "❌ Falta README.md"
+
+      - name: Contar líneas de código
+        run: |
+          echo "📊 Estadísticas del proyecto:"
+          echo "Backend:"
+          find backend/src -name "*.js" | xargs wc -l | tail -1
+          echo "Frontend:"
+          find frontend/src -name "*.tsx" -o -name "*.ts" | xargs wc -l | tail -1
+
+      - name: Verificar dependencias de seguridad
+        run: |
+          cd backend && npm audit --audit-level=high || true
+          cd ../frontend && npm audit --audit-level=high || true

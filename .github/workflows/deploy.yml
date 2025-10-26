@@ -1,0 +1,65 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Permite ejecutar manualmente
+
+jobs:
+  deploy-info:
+    name: Información de Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Información del deployment
+        run: |
+          echo "🚀 Sistema de Control de Pensum - Ready to Deploy"
+          echo ""
+          echo "📦 Versión: $(date +%Y.%m.%d)"
+          echo "🌿 Branch: ${{ github.ref_name }}"
+          echo "👤 Autor: ${{ github.actor }}"
+          echo "💬 Commit: ${{ github.event.head_commit.message }}"
+          echo ""
+          echo "Para deployar este proyecto, puedes usar:"
+          echo "  - Vercel (Frontend)"
+          echo "  - Railway (Backend + Database)"
+          echo "  - Render (Full Stack)"
+          echo "  - Heroku (Full Stack)"
+          echo ""
+          echo "📚 Ver INSTRUCCIONES.md para más detalles"
+
+  build-check:
+    name: Verificar Build de Producción
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: |
+          npm ci
+          npx prisma generate
+          echo "✅ Backend listo para producción"
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+          echo "✅ Frontend compilado para producción"
+          ls -lh dist/
+
+      - name: Deployment Ready
+        run: |
+          echo "✅ El proyecto está listo para ser deployado"
+          echo "📁 Archivos de build generados correctamente"

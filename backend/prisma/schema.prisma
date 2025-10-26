@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              Int               @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  email           String            @unique
+  password        String
+  matricula       String?           @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  trimestres      TrimestreUsuario[]
+  materiasCursadas MateriaCursada[]
+}
+
+model Materia {
+  id              Int       @id @default(autoincrement())
+  codigo          String    @unique
+  nombre          String
+  ht              Int       // Horas Teóricas
+  hp              Int       // Horas Prácticas
+  hit             Int       // Horas Interacción Tutorial
+  hei             Int       // Horas Estudio Independiente
+  creditos        Int
+  trimestre       Int       // Trimestre sugerido en el pensum (1-16)
+  prerrequisitos  String?   // Códigos de materias prerrequisito separados por coma
+  esOptativa      Boolean   @default(false)
+  esEspecial      Boolean   @default(false) // Para Servicio Social, Pasantía, etc.
+
+  materiasCursadas MateriaCursada[]
+}
+
+model TrimestreUsuario {
+  id              Int       @id @default(autoincrement())
+  usuarioId       Int
+  numeroTrimestre Int       // 1, 2, 3, etc.
+  periodo         String    // "Mayo-Julio 2025"
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  activo          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  materiasCursadas MateriaCursada[]
+
+  @@unique([usuarioId, numeroTrimestre])
+}
+
+model MateriaCursada {
+  id              Int       @id @default(autoincrement())
+  usuarioId       Int
+  materiaId       Int
+  trimestreId     Int?
+  estado          String    // "Cursando", "Aprobada", "Reprobada", "Pendiente"
+  nota            Float?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  materia         Materia   @relation(fields: [materiaId], references: [id])
+  trimestre       TrimestreUsuario? @relation(fields: [trimestreId], references: [id], onDelete: SetNull)
+
+  @@unique([usuarioId, materiaId])
+}
