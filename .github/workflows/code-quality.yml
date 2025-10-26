@@ -46,14 +46,24 @@ jobs:
         run: |
           echo "📊 Estadísticas del proyecto:"
           echo "Backend:"
-          find backend/src -name "*.js" | xargs wc -l | tail -1
+          find backend/src -name "*.js" 2>/dev/null | xargs wc -l 2>/dev/null | tail -1 || echo "No hay archivos .js"
           echo "Frontend:"
-          find frontend/src -name "*.tsx" -o -name "*.ts" | xargs wc -l | tail -1
+          find frontend/src -name "*.tsx" -o -name "*.ts" 2>/dev/null | xargs wc -l 2>/dev/null | tail -1 || echo "No hay archivos TypeScript"
 
       - name: Verificar dependencias de seguridad
         run: |
           echo "Auditando dependencias del backend..."
-          cd backend && npm ci && npm audit --audit-level=high || true
+          if [ -d "backend" ] && [ -f "backend/package.json" ]; then
+            cd backend && npm audit --audit-level=high || true
+            cd ..
+          else
+            echo "❌ No se puede auditar backend - directorio o package.json no encontrado"
+          fi
+          
           echo ""
           echo "Auditando dependencias del frontend..."
-          cd ../frontend && npm ci && npm audit --audit-level=high || true
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend && npm audit --audit-level=high || true
+          else
+            echo "❌ No se puede auditar frontend - directorio o package.json no encontrado"
+          fi
