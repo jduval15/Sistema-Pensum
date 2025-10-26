@@ -57,7 +57,7 @@ jobs:
           npm ci
           npm run build
           echo "✅ Frontend compilado para producción"
-          ls -lh dist/ || echo "⚠️ No se encontró carpeta dist"
+          ls -lh dist/
 
       - name: Deployment Ready
         run: |
